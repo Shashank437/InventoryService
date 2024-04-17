@@ -6,7 +6,10 @@ import { MongooseModule } from '@nestjs/mongoose';
 import 'dotenv/config';
 
 @Module({
-  imports: [ProductModule, MongooseModule.forRoot(process.env['MONGODB_URL'])],
+  imports: [
+    ProductModule,
+    MongooseModule.forRoot(`${process.env['MONGODB_URL']}/Product`),
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
