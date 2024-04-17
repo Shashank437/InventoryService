@@ -11,6 +11,7 @@ import {
 import { ProductService } from './product.service';
 import { Product, ProductDocument } from './product.schema';
 import { RateProduct } from './product.rate.dto';
+import { UpdateProduct } from './product.update.dto';
 
 @Controller('product')
 export class ProductController {
@@ -41,12 +42,28 @@ export class ProductController {
     return product;
   }
 
+  @Get(':id/history')
+  async getOrderHistory(@Param('id') id: string): Promise<any> {
+    const orderDetails = await this.productService.getProductHistory(id);
+    return orderDetails;
+  }
+
   @Put(':id')
   async update(
     @Param('id') id: string,
-    @Body() productDto: Product,
+    @Body() productDto: UpdateProduct,
   ): Promise<Product> {
     return this.productService.update(id, productDto);
+  }
+
+  @Put('/quantity/increase')
+  async increaseQuantity(@Body() productDto: UpdateProduct): Promise<void> {
+    this.productService.updateQuantity(productDto, 1);
+  }
+
+  @Put('/quantity/decrease')
+  async decreaseQuantity(@Body() productDto: UpdateProduct): Promise<void> {
+    this.productService.updateQuantity(productDto, -1);
   }
 
   @Delete(':id')

@@ -19,6 +19,9 @@ export class Product {
 
   @Prop({ required: true })
   rating: number;
+
+  @Prop({ required: true })
+  createdBy: number;
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);

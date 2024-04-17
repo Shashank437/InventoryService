@@ -1,9 +1,13 @@
 // products.service.ts
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Product, ProductDocument } from './product.schema';
 import { RateProduct } from './product.rate.dto';
+import axios from 'axios';
+import 'dotenv/config';
+import { UpdateProduct } from './product.update.dto';
+
 @Injectable()
 export class ProductService {
   constructor(
@@ -35,7 +39,7 @@ export class ProductService {
     return this.productModel.findById(id).exec();
   }
 
-  async update(id: string, product: Product): Promise<ProductDocument> {
+  async update(id: string, product: UpdateProduct): Promise<ProductDocument> {
     return this.productModel
       .findByIdAndUpdate(id, product, { new: true })
       .exec();
@@ -43,5 +47,29 @@ export class ProductService {
 
   async remove(id: string): Promise<void> {
     await this.productModel.findByIdAndDelete(id).exec();
+  }
+
+  async getProductHistory(id: string): Promise<any> {
+    const response = await axios({
+      method: 'GET',
+      url: `${process.env.ORDER_URL}/history/product/${id}`,
+    }).catch(() => {
+      throw new ForbiddenException('API not available');
+    });
+
+    return response.data;
+  }
+
+  async updateQuantity(
+    productDetails: UpdateProduct,
+    itr: number,
+  ): Promise<void> {
+    if (productDetails.productIds) {
+      productDetails.productIds.forEach((productId) => {
+        this.productModel.findByIdAndUpdate(productId, {
+          $inc: { quantity: itr },
+        });
+      });
+    }
   }
 }
