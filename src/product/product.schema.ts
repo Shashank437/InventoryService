@@ -21,7 +21,7 @@ export class Product {
   rating: number;
 
   @Prop({ required: true })
-  createdBy: number;
+  createdBy: string;
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);
